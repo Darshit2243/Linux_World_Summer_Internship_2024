@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Capture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        video {
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Camera Capture Demo</h1>
+    <video id="video" autoplay></video>
+    <button id="capture-btn">Capture Photo</button>
+    <button id="download-btn" style="display:none;">Download Photo</button>
+    <button id="upload-btn" style="display:none;">Upload Photo</button>
+    <canvas id="canvas"></canvas>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
