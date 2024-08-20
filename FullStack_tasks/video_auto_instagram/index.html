@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record and Upload Video</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        video {
+            margin: 20px 0;
+            border: 2px solid #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Record and Upload Video</h1>
+    <video id="video" width="320" height="240" autoplay></video>
+    <video id="recordedVideo" width="320" height="240" controls></video>
+    <br>
+    <button id="startBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop Recording</button>
+    <button id="uploadBtn" disabled>Upload Video</button>
+
+    <script>
+        let mediaRecorder;
+        let recordedBlobs;
+
+        const videoElement = document.getElementById('video');
+        const recordedVideo = document.getElementById('recordedVideo');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        // Access the camera and start the video stream
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                videoElement.srcObject = stream;
+                startBtn.addEventListener('click', () => startRecording(stream));
+                stopBtn.addEventListener('click', stopRecording);
+                uploadBtn.addEventListener('click', sendVideoToServer);
+            })
+            .catch(err => console.error('Error accessing media devices.', err));
+
+        function startRecording(stream) {
+            recordedBlobs = [];
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            mediaRecorder.ondataavailable = handleDataAvailable;
+            mediaRecorder.start();
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            uploadBtn.disabled = false;
+
+            const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
+            recordedVideo.src = window.URL.createObjectURL(superBuffer);
+        }
+
+        function handleDataAvailable(event) {
+            if (event.data && event.data.size > 0) {
+                recordedBlobs.push(event.data);
+            }
+        }
+
+        function sendVideoToServer() {
+            const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+            const formData = new FormData();
+            formData.append('video', blob, 'recording.webm');
+
+            fetch('https://your-server.com/upload', { // Replace with your server URL
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => console.log('Video uploaded successfully', data))
+                .catch(error => console.error('Error uploading video', error));
+        }
+    </script>
+</body>
+
+</html>
